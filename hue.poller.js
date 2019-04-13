@@ -55,13 +55,13 @@ function getSensorStatus() {
             data.name,
             data.type,
             parseInt(getSensorId(data.name)),
-            data.state.temperature,
-            data.state.presence,
-            data.state.lightlevel,
-            data.state.dark,
-            data.state.daylight,
-            data.state.buttonevent,
-            data.state.status
+            data.state.temperature ? data.state.temperature : null,
+            data.state.presence ? data.state.presence : null,
+            data.state.lightlevel ? data.state.lightlevel : null,
+            data.state.dark ? data.state.dark : null,
+            data.state.daylight ? data.state.daylight : null,
+            data.state.buttonevent ? data.state.buttonevent : null,
+            data.state.status ? data.state.status : null
           );
         }
       }
