@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "influx": "^5.0.7",
+    "npid": "^0.4.0"
+  }
+}

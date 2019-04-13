@@ -1,14 +1,23 @@
 var npid = require('npid');
- 
+// Create a PID
 try {
-    var pid = npid.create('hue.sensors.poller.pid');
-    pid.removeOnExit();
+  var pid = npid.create('hue.sensors.poller.pid');
+  pid.removeOnExit();
 } catch (err) {
-    console.log(err);
-    process.exit(1);
+  console.error(err);
+  process.exit(1);
 }
 
-var CONFIG = require('./config.json');
+var path = require('path');
+// Look for the config file
+if (path.existsSync('./config.json')) {
+  var CONFIG = require('./config.json');
+} else if (path.existsSync('/etc/hue-watch/config.json')) {
+  var CONFIG = require('/etc/hue-watch/config.json');
+} else {
+  console.error("Could not locate config file.");
+  process.exit(1);
+}
 
 var http = require('http');
 var hueHubGetSensors = {
@@ -28,8 +37,7 @@ setInterval(function () {
   getLightStatus();
 }, CONFIG.POLLINGTIME);
 
-function getSensorStatus()
-{
+function getSensorStatus() {
   console.log("Connecting to hueHub IP:" + CONFIG.HUEHUB_HOST + "PORT:" + CONFIG.HUEHUB_PORT);
   var reqGet = http.request(hueHubGetSensors, function (res) {
     var content;
@@ -42,22 +50,22 @@ function getSensorStatus()
       jsonContent = JSON.parse(content.substring(9, content.length));
       for (var key in jsonContent) {
         if (jsonContent.hasOwnProperty(key)) {
-            var data=jsonContent[key];
-            writeHueSensorToInflux(
-              data.name,
-              data.type,
-              parseInt(getSensorId(data.name)),
-              data.state.temperature,
-              data.state.presence,
-              data.state.lightlevel,
-              data.state.dark,
-              data.state.daylight,
-              data.state.buttonevent,
-              data.state.status
-            );
+          var data = jsonContent[key];
+          writeHueSensorToInflux(
+            data.name,
+            data.type,
+            parseInt(getSensorId(data.name)),
+            data.state.temperature,
+            data.state.presence,
+            data.state.lightlevel,
+            data.state.dark,
+            data.state.daylight,
+            data.state.buttonevent,
+            data.state.status
+          );
         }
-    }
-    
+      }
+
     });
   });
 
@@ -67,8 +75,7 @@ function getSensorStatus()
   });
 }
 
-function getLightStatus()
-{
+function getLightStatus() {
   console.log("Connecting to hueHub IP:" + CONFIG.HUEHUB_HOST + "PORT:" + CONFIG.HUEHUB_PORT);
   var reqGet = http.request(hueHubGetLights, function (res) {
     var content;
@@ -81,18 +88,18 @@ function getLightStatus()
       jsonContent = JSON.parse(content.substring(9, content.length));
       for (var key in jsonContent) {
         if (jsonContent.hasOwnProperty(key)) {
-            var data=jsonContent[key];
-            writeHueLightToInflux(
-              data.name,
-              data.type,
-              data.state.on,
-              data.state.bri,
-              data.state.hue,
-              data.state.sat
-            );
+          var data = jsonContent[key];
+          writeHueLightToInflux(
+            data.name,
+            data.type,
+            data.state.on,
+            data.state.bri,
+            data.state.hue,
+            data.state.sat
+          );
         }
-    }
-    
+      }
+
     });
   });
 
@@ -137,7 +144,7 @@ function writeHueSensorToInflux(
           status: Influx.FieldType.INTEGER
         },
         tags: [
-          'name','type','sensorid'
+          'name', 'type', 'sensorid'
         ]
       }
     ]
@@ -146,8 +153,8 @@ function writeHueSensorToInflux(
   influx.writePoints([
     {
       measurement: 'HueSensor',
-      tags: { name, type, sensorid},
-      fields: { temperature,presence,lightlevel,dark,daylight,buttonevent,status }
+      tags: { name, type, sensorid },
+      fields: { temperature, presence, lightlevel, dark, daylight, buttonevent, status }
     }
   ]);
 }
@@ -174,7 +181,7 @@ function writeHueLightToInflux(
           sat: Influx.FieldType.INTEGER
         },
         tags: [
-          'name','type'
+          'name', 'type'
         ]
       }
     ]
@@ -183,8 +190,8 @@ function writeHueLightToInflux(
   influx.writePoints([
     {
       measurement: 'HueLight',
-      tags: { name, type},
-      fields: { on,bri,hue,sat }
+      tags: { name, type },
+      fields: { on, bri, hue, sat }
     }
   ]);
 }
