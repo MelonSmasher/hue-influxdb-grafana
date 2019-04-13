@@ -8,7 +8,7 @@ try {
   process.exit(1);
 }
 
-var path = require('path');
+var path = require('fs');
 // Look for the config file
 if (path.existsSync('./config.json')) {
   var CONFIG = require('./config.json');
