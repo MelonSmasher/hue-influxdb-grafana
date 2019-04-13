@@ -1,12 +1,3 @@
-var npid = require('npid');
-// Create a PID
-try {
-  var pid = npid.create('hue.sensors.poller.pid');
-  pid.removeOnExit();
-} catch (err) {
-  console.error(err);
-  process.exit(1);
-}
 
 var path = require('fs');
 // Look for the config file
