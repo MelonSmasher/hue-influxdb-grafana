@@ -1,0 +1,8 @@
+{
+    "HUEHUB_HOST": "<put-your-philips-hub-ip-address-key-here>",
+    "HUEHUB_PORT": 80,
+    "HUEAPIKEY": "<put-your-philips-hub-api-key-here>",    
+    "INFLUXDB_HOST": "localhost",    
+    "INFLUXDB_HUESENSOR_DB": "hue",
+    "POLLINGTIME": 10000
+}
